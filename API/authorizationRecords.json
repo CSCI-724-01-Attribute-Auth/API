@@ -1,0 +1,40 @@
+[
+    {
+      "ClientId": "001",
+      "Method": "GET",
+      "Path": "/api/movie/{movie_id}",
+      "AuthorizedAttributes": [
+        "$.movie.title",
+        "$.movie.description",
+        "$.movie.releaseDate"
+      ]
+    },
+    {
+      "ClientId": "001",
+      "Method": "GET",
+      "Path": "/api/person/{person_id}",
+      "AuthorizedAttributes": [
+        "$.person.name",
+        "$.person.birthDate",
+        "$.person.mostFamousMovie"
+      ]
+    },
+    {
+      "ClientId": "002",
+      "Method": "GET",
+      "Path": "/api/movie/{movie_id}",
+      "AuthorizedAttributes": [
+        "$.movie.title",
+        "$.movie.crewIds"
+      ]
+    },
+    {
+      "ClientId": "002",
+      "Method": "GET",
+      "Path": "/api/person/{person_id}",
+      "AuthorizedAttributes": [
+        "$.person.name"
+      ]
+    }
+  ]
+  
