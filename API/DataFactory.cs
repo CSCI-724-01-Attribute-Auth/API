@@ -1,6 +1,7 @@
-﻿using API.Models;
+﻿using API.Data;
+using API.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace API
@@ -13,117 +14,64 @@ namespace API
 
         private static string[] _movieNames =
         {
-            "Dreamweaver's Pact", "Beneath the Icebound Skies", "Eclipse Protocol", "Riddle of the Lost Key", "Neon Rebellion", "Reign of Shadows", "Celestial Veil", "Enigma in Black", "Moonstone Manor", "Lost in Neon Paradise", "Celestial Drift: A Cosmic Journey", "Dance of the Elementals", "The Last Whisper of Stardust", "Echoes of the Lost City", "The Midnight Serpent", "Enchanted Dreamscape", "The Phantom Key", "Echoes from the Shadowlands", "Nightshade Manor", "Midnight Firestorm", "Infinite Mirage", "Echoes of a Distant Star", "Last Train to Nowhere", "Echoes in the Neon Mist", "The Clockwork Serpent", "Quantum Drift: The Edge of Time", "Sunset Dreams", "Shadow Walker", "Neon Nightscape", "Stellar Secrets", "Tides of Infinity", "The Mechanical Heartbeat", "A Symphony of Silence", "Beneath the Velvet Sky", "The Last Ember Chronicles", "Celestial Fracture", "Whispers of the Forgotten", "Shadows in the Paradox", "The Clockwork Mirage", "Echoes of Tomorrow", "The Clockwork Whisper", "Celestial Rift", "Galactic Blossom", "Enchanted Dreamscape", "Shadowland Quest", "Starstruck City", "Wintermoon Wasteland", "Stellar Collision", "The Forgotten Kingdom", "Echoes of the Forgotten Realm", "Echoes of the Forgotten Sky", "Portals in Time", "Shadows in the Ether", "Galactic Diner: Cosmos Unplugged", "Shadow of the Unknown", "Shattered Realms", "Phantom Chronicles", "Nova Nightmares", "Firestorm Frontier", "Shadowbound", "Chronicles of the Celestial Tide", "The Clockwork Veil", "Galactic Drift", "Whispers from the Abyss", "Lunar Phantoms", "9 .Labyrinth of Dreams", "Phantom Serenade", "The Curse of Crimson Manor", "Enigma of Serenity", "Tales of the Lost Kingdom", "Shadows of a Forgotten Dawn", "Echoes from the Time Machine", "Beneath the Iron Sky", "Whispering Steel", "Phantom Rhapsody", "Cybernetic Reckoning", "Whisper in the Shadows", "Shadowfall", "Lunar Echoes", "Quantum Quest"
+            "Dreamweaver's Pact", "Beneath the Icebound Skies", "Eclipse Protocol", "Riddle of the Lost Key", "Neon Rebellion", "Reign of Shadows", "Celestial Veil", "Enigma in Black", "Moonstone Manor", "Lost in Neon Paradise", "Celestial Drift: A Cosmic Journey", "Dance of the Elementals", "The Last Whisper of Stardust", "Echoes of the Lost City", "The Midnight Serpent", "Enchanted Dreamscape", "The Phantom Key", "Echoes from the Shadowlands", "Nightshade Manor", "Midnight Firestorm", "Infinite Mirage", "Echoes of a Distant Star", "Last Train to Nowhere", "Echoes in the Neon Mist", "The Clockwork Serpent", "Quantum Drift: The Edge of Time", "Sunset Dreams", "Shadow Walker", "Neon Nightscape", "Stellar Secrets", "Tides of Infinity", "The Mechanical Heartbeat", "A Symphony of Silence", "Beneath the Velvet Sky", "The Last Ember Chronicles", "Celestial Fracture", "Whispers of the Forgotten", "Shadows in the Paradox", "The Clockwork Mirage", "Echoes of Tomorrow", "The Clockwork Whisper", "Celestial Rift", "Galactic Blossom", "Enchanted Dreamscape 2", "Shadowland Quest", "Starstruck City", "Wintermoon Wasteland", "Stellar Collision", "The Forgotten Kingdom", "Echoes of the Forgotten Realm", "Echoes of the Forgotten Sky", "Portals in Time", "Shadows in the Ether", "Galactic Diner: Cosmos Unplugged", "Shadow of the Unknown", "Shattered Realms", "Phantom Chronicles", "Nova Nightmares", "Firestorm Frontier", "Shadowbound", "Chronicles of the Celestial Tide", "The Clockwork Veil", "Galactic Drift", "Whispers from the Abyss", "Lunar Phantoms", "9 .Labyrinth of Dreams", "Phantom Serenade", "The Curse of Crimson Manor", "Enigma of Serenity", "Tales of the Lost Kingdom", "Shadows of a Forgotten Dawn", "Echoes from the Time Machine", "Beneath the Iron Sky", "Whispering Steel", "Phantom Rhapsody", "Cybernetic Reckoning", "Whisper in the Shadows", "Shadowfall", "Lunar Echoes", "Quantum Quest"
         };
 
-        public List<Movie> Movies { get; set; } = new List<Movie>();
-        public List<Person> Persons { get; set; } = new List<Person>();
-
-        public DataFactory(int movieCount) 
+        public void Seed(DBContext dbContext)
         {
-            if (movieCount > 80 || movieCount < 0)
+            for (int i = 0; i < 80; i++)
             {
-                throw new InvalidOperationException("The movie count must between 0 and 80.");
-            }
+                Movie movie = new()
+                {
+                    Title = _movieNames[i],
+                    Description = LoremIpsum(5, 10, 1, 5),
+                    ReleaseDate = RandomDay(),
+                    TotalBudget = Math.Round(gen.NextDouble() * 900_000 + 100_000, 2),
+                    TotalCost = Math.Round(gen.NextDouble() * 900_000 + 100_000, 2),
+                };
+                dbContext.Movies.Add(movie);
+                dbContext.SaveChanges();
 
-            for (int i = 0; i < movieCount; i++)
-            {
+                movie = dbContext.Movies.Single(m => m.Title == _movieNames[i]);
+
                 var crew = new List<Person>();
 
                 for (int j = 0; j < gen.Next(10); j++)
                 {
                     Person toAdd;
 
-                    if (gen.Next(10) == 1 && Persons.Count > 0)
+                    if (gen.Next(10) == 1 && dbContext.Persons.Count() > 0)
                     {
-                        toAdd = Persons[gen.Next(Persons.Count)];
+                        toAdd = dbContext.Persons.OrderBy(p => Guid.NewGuid()).Where(p => !crew.Select(c => c.Id).Contains(p.Id)).First();
                         if (gen.Next(2) == 0)
                         {
-                            toAdd.MostFamousMovie = i;
+                            toAdd.MostFamousMovieId = movie.Id;
                         }
+                        dbContext.Persons.Update(toAdd);
                     }
                     else
                     {
-                        toAdd = new Person
+                        toAdd = new()
                         {
-                            Id = Guid.NewGuid(),
                             BirthDate = RandomDay(new DateTime(2005, 1, 1)),
-                            MostFamousMovie = i,
+                            MostFamousMovieId = movie.Id,
                             Name = textInfo.ToTitleCase(LoremIpsum(2, 2, 1, 1).Trim().TrimEnd('.'))
                         };
+                        dbContext.Persons.Add(toAdd);
                     }
 
                     crew.Add(toAdd);
-                    Persons.Add(toAdd);
+                    dbContext.SaveChanges();
                 }
 
-                Movie movie = new Movie
+                
+                dbContext.CrewMembers.UpdateRange(crew.Select(c => new CrewMember
                 {
-                    Id = i,
-                    Title = _movieNames[i],
-                    Description = LoremIpsum(5, 10, 1, 5),
-                    ReleaseDate = RandomDay(),
-                    TotalBudget = Math.Round(gen.NextDouble() * 900_000 + 100_000, 2),
-                    TotalCost = Math.Round(gen.NextDouble() * 900_000 + 100_000, 2),
-                    CrewIds = crew.Select(p => p.Id).ToList()
-                };
-                Movies.Add(movie);
+                    MovieId = movie.Id,
+                    PersonId = c.Id
+                }));
+                dbContext.SaveChanges();
             }
-        }
-
-        public Movie? GetMovieById(int movieId)
-        {
-            return Movies.SingleOrDefault(m => m.Id == movieId);
-        }
-
-        public Person? GetPersonById(Guid personId)
-        {
-            return Persons.SingleOrDefault(p => p.Id == personId);
-        }
-
-        public Movie CreateMovie(string title, string description, double totalBudget, double totalCost, DateTime releaseDate, List<Guid> crewIds)
-        {
-            foreach (var cId in crewIds)
-            {
-                if (!Persons.Select(p => p.Id).Contains(cId))
-                {
-                    throw new InvalidDataException("There is a crew Id that is not in the set of crew. Please create this person and try again.");
-                }
-            }
-
-            var toAdd = new Movie
-            {
-                Id = Movies.Count,
-                Title = title,
-                Description = description,
-                TotalBudget = totalBudget,
-                TotalCost = totalCost,
-                ReleaseDate = releaseDate,
-                CrewIds = crewIds
-            };
-
-            Movies.Add(toAdd);
-
-            return toAdd;
-        }
-
-        public Person CreatePerson(string name, DateTime birthDate, int mostFamousMovie)
-        {
-            if (!Movies.Select(m => m.Id).Contains(mostFamousMovie))
-            {
-                throw new InvalidDataException("The movie Id associated with this person's most famous movie does not exist. Please create this movie and try again.");
-            }
-
-            var toAdd = new Person
-            {
-                Id = Guid.NewGuid(),
-                Name = name,
-                BirthDate = birthDate,
-                MostFamousMovie = mostFamousMovie
-            };
-
-            Persons.Add(toAdd);
-            return toAdd;
         }
 
         private static string LoremIpsum(int minWords, int maxWords,
@@ -138,7 +86,7 @@ namespace API
                 + minSentences;
             int numWords = gen.Next(maxWords - minWords) + minWords;
 
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
 
             for (int s = 0; s < numSentences; s++)
             {
@@ -155,7 +103,7 @@ namespace API
 
         private static DateTime RandomDay(DateTime end)
         {
-            DateTime start = new DateTime(1940, 1, 1);
+            DateTime start = new(1940, 1, 1);
             int range = (end - start).Days;
             return start.AddDays(gen.Next(range));
         }
