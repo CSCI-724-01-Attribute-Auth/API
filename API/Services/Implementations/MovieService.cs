@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Models;
 using API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services.Implementations
 {
@@ -15,11 +16,11 @@ namespace API.Services.Implementations
 
         public List<Movie> GetAllMovies()
         {
-            return _dbContext.Movies.ToList();
+            return _dbContext.Movies.Include(m => m.Crew).AsNoTracking().ToList();
         }
 
         public Movie? GetMovie(int id) {
-            return _dbContext.Movies.SingleOrDefault(m => m.Id == id);
+            return _dbContext.Movies.Include(m => m.Crew).SingleOrDefault(m => m.Id == id);
         }
 
         public Movie CreateMovie(string title, string description, double totalBudget, double totalCost, DateTime releaseDate, List<int> crewIds)
@@ -34,7 +35,6 @@ namespace API.Services.Implementations
 
             var toAdd = new Movie
             {
-                Id = _dbContext.Movies.Count(),
                 Title = title,
                 Description = description,
                 TotalBudget = totalBudget,

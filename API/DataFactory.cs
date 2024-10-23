@@ -48,12 +48,20 @@ namespace API
 
                     if (gen.Next(10) == 1 && dbContext.Persons.Count() > 0)
                     {
-                        toAdd = dbContext.Persons.OrderBy(p => Guid.NewGuid()).Where(p => !crew.Select(c => c.Id).Contains(p.Id)).First();
-                        if (gen.Next(2) == 0)
+                        try
                         {
-                            toAdd.MostFamousMovieId = movie.Id;
+                            toAdd = dbContext.Persons.OrderBy(p => Guid.NewGuid()).First(p => !crew.Select(c => c.Id).Contains(p.Id));
+
+                            if (gen.Next(2) == 0)
+                            {
+                                toAdd.MostFamousMovieId = movie.Id;
+                            }
+                            dbContext.Persons.Update(toAdd);
                         }
-                        dbContext.Persons.Update(toAdd);
+                        catch (InvalidOperationException) {
+
+                            toAdd = dbContext.Persons.OrderBy(p => Guid.NewGuid()).First();
+                        }
                     }
                     else
                     {
@@ -66,17 +74,22 @@ namespace API
                         dbContext.Persons.Add(toAdd);
                     }
 
-                    // Adding the person to both the movie crew and global list of persons
-                    crew.Add(toAdd);
                     dbContext.SaveChanges();
+                    toAdd = dbContext.Persons.Single(p => p.Name == toAdd.Name && p.BirthDate == toAdd.BirthDate);
+
+                    try
+                    {
+                        dbContext.CrewMembers.Add(new CrewMember
+                        {
+                            MovieId = movie.Id,
+                            PersonId = toAdd.Id
+                        });
+                        dbContext.SaveChanges();
+                    }
+                    catch (InvalidOperationException) { }
+
+                    crew.Add(toAdd);
                 }
-                
-                dbContext.CrewMembers.UpdateRange(crew.Select(c => new CrewMember
-                {
-                    MovieId = movie.Id,
-                    PersonId = c.Id
-                }));
-                dbContext.SaveChanges();
             }
         }
 

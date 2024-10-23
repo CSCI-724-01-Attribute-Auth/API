@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Models;
 using API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services.Implementations
 {
@@ -15,11 +16,11 @@ namespace API.Services.Implementations
 
         public List<Person> GetAllPersons()
         {
-            return _dbContext.Persons.ToList();
+            return _dbContext.Persons.Include(p => p.MostFamousMovie).Include(p => p.WorkedOn).AsNoTracking().ToList();
         }
 
         public Person? GetPerson(int id) {
-            return _dbContext.Persons.SingleOrDefault(m => m.Id == id);
+            return _dbContext.Persons.Include(p => p.MostFamousMovie).Include(p => p.WorkedOn).SingleOrDefault(m => m.Id == id);
         }
 
         public Person CreatePerson(string name, DateTime birthDate, int mostFamousMovieId)
@@ -31,7 +32,6 @@ namespace API.Services.Implementations
 
             var toAdd = new Person
             {
-                Id = _dbContext.Movies.Count(),
                 Name = name,
                 BirthDate = birthDate,
                 MostFamousMovieId = mostFamousMovieId
