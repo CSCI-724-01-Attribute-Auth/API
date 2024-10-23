@@ -1,11 +1,31 @@
 #nullable disable
-namespace API.Models
+
+using System.Text.Json;
+using System.ComponentModel.DataAnnotations.Schema;
+
+public class AuthorizedAttributes
 {
-    public class AuthorizationRecord
+    public string ClientId { get; set; }
+
+    public string Method { get; set; }
+
+    public string Path { get; set; }
+
+    public string AttributeList { get; set; }
+
+    // This essentially is our new Loader
+    [NotMapped]
+    public List<string> JSONAttributeList
     {
-        public string ClientId { get; set; }
-        public string Method { get; set; }
-        public string Path { get; set; }
-        public List<string> AuthorizedAttributes { get; set; }
+        get
+        {
+            return string.IsNullOrEmpty(AttributeList)
+                ? new List<string>()
+                : JsonSerializer.Deserialize<List<string>>(AttributeList);
+        }
+        set
+        {
+            AttributeList = JsonSerializer.Serialize(value);
+        }
     }
 }

@@ -35,8 +35,6 @@ namespace API
                 dbContext.Movies.Add(movie);
                 dbContext.SaveChanges();
 
-                movie = dbContext.Movies.Single(m => m.Title == _movieNames[i]);
-
                 var crew = new List<Person>();
 
                 // Generating a random number of crew members for each movie
@@ -75,7 +73,6 @@ namespace API
                     }
 
                     dbContext.SaveChanges();
-                    toAdd = dbContext.Persons.Single(p => p.Name == toAdd.Name && p.BirthDate == toAdd.BirthDate);
 
                     try
                     {

@@ -41,13 +41,14 @@ namespace API.Services.Implementations
                 TotalCost = totalCost,
                 ReleaseDate = releaseDate
             };
+            _dbContext.Movies.Add(toAdd);
+            _dbContext.SaveChanges();
 
             _dbContext.CrewMembers.AddRange(crewIds.Select(c => new CrewMember
             {
                 MovieId = toAdd.Id,
                 PersonId = c
             }));
-            _dbContext.Movies.Add(toAdd);
             _dbContext.SaveChanges();
 
             return toAdd;
