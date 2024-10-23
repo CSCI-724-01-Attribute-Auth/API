@@ -9,6 +9,6 @@ namespace API.Models
         public double TotalBudget { get; set; }
         public double TotalCost { get; set; }
         public DateTime ReleaseDate { get; set; }
-        public List<Guid> CrewIds { get; set; }
+        public virtual List<Person> Crew { get; set; }
     }
 }
