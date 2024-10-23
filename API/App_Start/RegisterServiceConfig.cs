@@ -12,6 +12,7 @@ namespace API.App_Start
             services.AddScoped<IPersonService, PersonService>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<DataFactory>();
+            services.AddScoped<IndexBuilder>();
         }
     }
 }

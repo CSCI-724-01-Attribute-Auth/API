@@ -34,6 +34,8 @@ namespace API.Data
         {
             ArgumentNullException.ThrowIfNull(modelBuilder);
 
+            modelBuilder.Entity<TableHashResult>().HasNoKey();
+
             modelBuilder.Entity<Movie>(entity =>
             {
                 entity.ToTable(nameof(Movie));
