@@ -20,7 +20,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<Person>), StatusCodes.Status200OK)]
         public IActionResult All()
         {
-            return StatusCode(StatusCodes.Status200OK, _personService.GetAllPersons());
+            return StatusCode(StatusCodes.Status200OK, new { persons = _personService.GetAllPersons() });
         }
 
         [HttpGet("")]
@@ -34,7 +34,7 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status204NoContent);
             }
 
-            return StatusCode(StatusCodes.Status200OK, person);
+            return StatusCode(StatusCodes.Status200OK, new { person });
         }
 
         [HttpPost("")]
@@ -51,7 +51,7 @@ namespace API.Controllers
             {
                 var createdPerson = _personService.CreatePerson(name, birthDate, mostFamousMovieId);
 
-                return StatusCode(StatusCodes.Status201Created, createdPerson);
+                return StatusCode(StatusCodes.Status201Created, new { person = createdPerson });
             }
             catch (InvalidDataException ex)
             {

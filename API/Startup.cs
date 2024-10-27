@@ -2,6 +2,7 @@ using API;
 using API.App_Start;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 
 public class Startup 
@@ -26,6 +27,12 @@ public class Startup
                     .AllowAnyMethod();
                 });
         });
+
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
 
         services.AddDbContext<DBContext>(options => options.UseSqlServer(connectionString));
 

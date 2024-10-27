@@ -1,4 +1,6 @@
 ﻿#nullable disable
+using System.Text.Json.Serialization;
+
 namespace API.Models
 {
     public class Movie
@@ -9,6 +11,8 @@ namespace API.Models
         public double TotalBudget { get; set; }
         public double TotalCost { get; set; }
         public DateTime ReleaseDate { get; set; }
+
+        //[JsonIgnore]
         public virtual List<Person> Crew { get; set; }
     }
 }

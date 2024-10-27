@@ -18,6 +18,8 @@ namespace API.Data
 
         public virtual DbSet<CrewMember> CrewMembers { get; set; }
 
+        public virtual DbSet<AuthorizedAttributes> AuthorizedAttributes { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(optionsBuilder);
@@ -31,6 +33,8 @@ namespace API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ArgumentNullException.ThrowIfNull(modelBuilder);
+
+            modelBuilder.Entity<TableHashResult>().HasNoKey();
 
             modelBuilder.Entity<Movie>(entity =>
             {
@@ -114,6 +118,29 @@ namespace API.Data
 
                 entity.Property(e => e.MovieId)
                     .HasColumnType("int")
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity<AuthorizedAttributes>(entity =>
+            {
+                entity.ToTable(nameof(AuthorizedAttributes));
+
+                entity.HasKey(e => new { e.ClientId, e.Method, e.Path });
+
+                entity.Property(e => e.ClientId)
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
+
+                entity.Property(e => e.Method)
+                    .HasColumnType("varchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.Path)
+                    .HasColumnType("varchar(255)")
+                    .IsRequired();
+
+                entity.Property(e => e.AttributeList)
+                    .HasColumnType("json")
                     .IsRequired();
             });
         }

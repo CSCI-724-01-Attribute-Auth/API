@@ -1,0 +1,190 @@
+[
+    {
+        "ClientId": "001",
+        "Method": "GET",
+        "Path": "/movie/all",
+        "AuthorizedAttributes":
+        [
+            "$.movies[*].id",
+            "$.movies[*].title",
+            "$.movies[*].description",
+            "$.movies[*].releaseDate",
+            "$.movies[*].totalCost",
+            "$.movies[*].totalBudget",
+            "$.movies[*].crew[*].id",
+            "$.movies[*].crew[*].name",
+            "$.movies[*].crew[*].birthDate",
+            "$.movies[*].crew[*].mostFamousMovieId"
+        ]
+    },
+    {
+        "ClientId": "001",
+        "Method": "GET",
+        "Path": "/movie",
+        "AuthorizedAttributes":
+        [
+            "$.movie.id",
+            "$.movie.title",
+            "$.movie.description",
+            "$.movie.releaseDate",
+            "$.movie.totalCost",
+            "$.movie.totalBudget",
+            "$.movie.crew[*].id",
+            "$.movie.crew[*].name",
+            "$.movie.crew[*].birthDate",
+            "$.movie.crew[*].mostFamousMovieId"
+        ]
+    },
+    {
+        "ClientId": "001",
+        "Method": "POST",
+        "Path": "/movie",
+        "AuthorizedAttributes":
+        [
+            "$.movie.id",
+            "$.movie.title",
+            "$.movie.description",
+            "$.movie.releaseDate",
+            "$.movie.totalCost",
+            "$.movie.totalBudget",
+            "$.movie.crew[*].id",
+            "$.movie.crew[*].name",
+            "$.movie.crew[*].birthDate",
+            "$.movie.crew[*].mostFamousMovieId"
+        ]
+    },
+    {
+        "ClientId": "001",
+        "Method": "GET",
+        "Path": "/person/all",
+        "AuthorizedAttributes":
+        [
+            "$.persons[*].id",
+            "$.persons[*].name",
+            "$.persons[*].birthDate",
+            "$.persons[*].mostFamousMovieId",
+            "$.persons[*].mostFamousMovie.id",
+            "$.persons[*].mostFamousMovie.title",
+            "$.persons[*].mostFamousMovie.description",
+            "$.persons[*].mostFamousMovie.totalBudget",
+            "$.persons[*].mostFamousMovie.totalCost",
+            "$.persons[*].mostFamousMovie.releaseDate",
+            "$.persons[*].workedOn[*].id",
+            "$.persons[*].workedOn[*].title",
+            "$.persons[*].workedOn[*].description",
+            "$.persons[*].workedOn[*].totalBudget",
+            "$.persons[*].workedOn[*].totalCost",
+            "$.persons[*].workedOn[*].releaseDate"
+        ]
+    },
+    {
+        "ClientId": "001",
+        "Method": "GET",
+        "Path": "/person",
+        "AuthorizedAttributes":
+        [
+            "$.person.id",
+            "$.person.name",
+            "$.person.birthDate",
+            "$.person.mostFamousMovieId",
+            "$.person.mostFamousMovie.id",
+            "$.person.mostFamousMovie.title",
+            "$.person.mostFamousMovie.description",
+            "$.person.mostFamousMovie.totalBudget",
+            "$.person.mostFamousMovie.totalCost",
+            "$.person.mostFamousMovie.releaseDate",
+            "$.person.workedOn[*].id",
+            "$.person.workedOn[*].title",
+            "$.person.workedOn[*].description",
+            "$.person.workedOn[*].totalBudget",
+            "$.person.workedOn[*].totalCost",
+            "$.person.workedOn[*].releaseDate"
+        ]
+    },
+    {
+        "ClientId": "001",
+        "Method": "POST",
+        "Path": "/person",
+        "AuthorizedAttributes":
+        [
+            "$.person.id",
+            "$.person.name",
+            "$.person.birthDate",
+            "$.person.mostFamousMovieId",
+            "$.person.mostFamousMovie.id",
+            "$.person.mostFamousMovie.title",
+            "$.person.mostFamousMovie.description",
+            "$.person.mostFamousMovie.totalBudget",
+            "$.person.mostFamousMovie.totalCost",
+            "$.person.mostFamousMovie.releaseDate"
+        ]
+    },
+    {
+        "ClientId": "002",
+        "Method": "GET",
+        "Path": "/movie/all",
+        "AuthorizedAttributes":
+        [
+            "$.movies[*].id",
+            "$.movies[*].title",
+            "$.movies[*].description",
+            "$.movies[*].releaseDate",
+            "$.movies[*].crew[*].id",
+            "$.movies[*].crew[*].name",
+            "$.movies[*].crew[*].mostFamousMovieId"
+        ]
+    },
+    {
+        "ClientId": "002",
+        "Method": "GET",
+        "Path": "/movie",
+        "AuthorizedAttributes":
+        [
+            "$.movie.id",
+            "$.movie.title",
+            "$.movie.description",
+            "$.movie.releaseDate",
+            "$.movie.crew[*].id",
+            "$.movie.crew[*].name",
+            "$.movie.crew[*].mostFamousMovieId"
+        ]
+    },
+    {
+        "ClientId": "002",
+        "Method": "GET",
+        "Path": "/person/all",
+        "AuthorizedAttributes":
+        [
+            "$.persons[*].id",
+            "$.persons[*].name",
+            "$.persons[*].mostFamousMovieId",
+            "$.persons[*].mostFamousMovie.id",
+            "$.persons[*].mostFamousMovie.title",
+            "$.persons[*].mostFamousMovie.description",
+            "$.persons[*].mostFamousMovie.releaseDate",
+            "$.persons[*].workedOn[*].id",
+            "$.persons[*].workedOn[*].title",
+            "$.persons[*].workedOn[*].description",
+            "$.persons[*].workedOn[*].releaseDate"
+        ]
+    },
+    {
+        "ClientId": "002",
+        "Method": "GET",
+        "Path": "/person",
+        "AuthorizedAttributes":
+        [
+            "$.person.id",
+            "$.person.name",
+            "$.person.mostFamousMovieId",
+            "$.person.mostFamousMovie.id",
+            "$.person.mostFamousMovie.title",
+            "$.person.mostFamousMovie.description",
+            "$.person.mostFamousMovie.releaseDate",
+            "$.person.workedOn[*].id",
+            "$.person.workedOn[*].title",
+            "$.person.workedOn[*].description",
+            "$.person.workedOn[*].releaseDate"
+        ]
+    }
+]

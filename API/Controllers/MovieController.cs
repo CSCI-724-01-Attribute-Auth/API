@@ -20,7 +20,7 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
         public IActionResult All()
         {
-            return StatusCode(StatusCodes.Status200OK, _movieService.GetAllMovies());
+            return StatusCode(StatusCodes.Status200OK, new { movies = _movieService.GetAllMovies() });
         }
 
         [HttpGet("")]
@@ -34,7 +34,7 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status204NoContent);
             }
 
-            return StatusCode(StatusCodes.Status200OK, movie);
+            return StatusCode(StatusCodes.Status200OK, new { movie });
         }
 
         [HttpPost("")]
@@ -54,7 +54,7 @@ namespace API.Controllers
             {
                 var createdMovie = _movieService.CreateMovie(title, description, totalBudget, totalCost, releaseDate, crewIds);
 
-                return StatusCode(StatusCodes.Status201Created, createdMovie);
+                return StatusCode(StatusCodes.Status201Created, new { movie = createdMovie });
             }
             catch (InvalidDataException ex)
             {
