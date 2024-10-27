@@ -1,76 +1,40 @@
 using API;
+using API.Data;
 
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
-
-var apiGroup = app.MapGroup("/api");
-
-var dataFactory = new DataFactory(15);
-
-app.MapGet("/", () => Results.Ok("Welcome to our API!"));
-
-#region Movies
-
-apiGroup.MapGet("/movies", () => Results.Ok(dataFactory.Movies));
-
-apiGroup.MapGet("/movie", (int id) =>
+public class Program
 {
-    var movie = dataFactory.GetMovieById(id);
-
-    if (movie == null)
+    public static void Main(string[] args)
     {
-        return Results.NotFound();
+        var app = CreateHostBuilder(args).Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            try
+            {
+                var context = services.GetRequiredService<DBContext>();
+                var dataFactory = services.GetRequiredService<DataFactory>();
+
+                // Check if the database is empty and seed it
+                if (!context.Movies.Any())
+                {
+                    dataFactory.Seed(context); // Call your seeding logic here
+                }
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while seeding the database.");
+            }
+        }
+
+        app.Run();
     }
 
-    return Results.Ok(movie);
-});
-
-apiGroup.MapPost("/movies", (string title, string description, double totalBudget, double totalCost, DateTime releaseDate, List<Guid> crewIds) =>
-{
-    try
-    {
-        var created = dataFactory.CreateMovie(title, description, totalBudget, totalCost, releaseDate, crewIds);
-
-        return Results.Created($"api/movie?id={created.Id}", created);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
-});
-
-#endregion
-
-#region Persons
-
-apiGroup.MapGet("/persons", () => Results.Ok(dataFactory.Persons));
-
-apiGroup.MapGet("/person", (Guid id) =>
-{
-    var person = dataFactory.GetPersonById(id);
-
-    if (person == null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Ok(person);
-});
-
-apiGroup.MapPost("/persons", (string name, DateTime birthDate, int mostFamousMovie) =>
-{
-    try
-    {
-        var created = dataFactory.CreatePerson(name, birthDate, mostFamousMovie);
-
-        return Results.Created($"api/person?id={created.Id}", created);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
-});
-
-#endregion
-
-app.Run();
+    public static IHostBuilder CreateHostBuilder(string[] args) => 
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
+}
