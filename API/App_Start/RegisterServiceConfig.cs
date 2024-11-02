@@ -13,6 +13,8 @@ namespace API.App_Start
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<DataFactory>();
             services.AddScoped<IndexBuilder>();
+            services.AddScoped<Retriever>();
+            services.AddScoped<ResponseBuilder>();
         }
     }
 }
