@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 
-public class Startup 
+public class Startup
 {
     private readonly string myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -15,7 +15,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var connectionString = "Server=tcp:csci724-project.database.windows.net,1433;Initial Catalog=api-database;Persist Security Info=False;User ID=CSCI724Admin;Password=C$c1Pr0ject4dm!n;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        var connectionString = "Server=tcp:csci724-project.database.windows.net,1433;Initial Catalog=api-database;Persist Security Info=False;User ID=CSCI724Admin;Password=C$c1Pr0ject4dm!n;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=120;";
 
         services.AddCors(options =>
         {

@@ -3,6 +3,12 @@ using API.Models;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
+// The MovieService class acts as a centralized service layer for managing Movie entities,
+//  performing create, retrieve, and validate operations with a clear separation of concerns. 
+// The CreateMovie method includes validation to prevent inconsistent crew assignments, ensuring
+// the integrity of the movie-crew relationships. This service would likely be used by other parts 
+//of the application to access and manage movie data reliably.
+
 namespace API.Services.Implementations
 {
     public class MovieService : IMovieService
