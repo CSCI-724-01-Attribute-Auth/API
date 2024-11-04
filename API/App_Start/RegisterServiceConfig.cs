@@ -1,4 +1,5 @@
-﻿using API.Services.Implementations;
+﻿using API.Authorization;
+using API.Services.Implementations;
 using API.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -13,8 +14,11 @@ namespace API.App_Start
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<DataFactory>();
             services.AddScoped<IndexBuilder>();
-            services.AddScoped<Retriever>();
-            services.AddScoped<ResponseBuilder>();
+            services.AddSingleton<IndexCache>();
+            services.AddSingleton<Mapper>();
+            services.AddSingleton<ResponseBuilder>();
+            services.AddSingleton<Retriever>();
+            services.AddHostedService<CacheRefreshService>();
         }
     }
 }

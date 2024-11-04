@@ -2,16 +2,12 @@ using Newtonsoft.Json.Linq;
 
 public class Mapper
 {
-    private readonly HashSet<string> paths = new HashSet<string>();  // Use HashSet to prevent duplicates
-
-    public List<string> MapMovieAttributes(string jsonResponse)
+    public List<string> MapMovieAttributes(JToken jsonResponse)
     {
-        paths.Clear();  // Clear previous paths for new processing
-
         try
         {
-            var parsedJson = JToken.Parse(jsonResponse);  // Parse JSON into a JToken structure
-            GetJsonPaths(parsedJson, "$");  // Start recursive path generation from root ($)
+            var paths = new HashSet<string>();
+            GetJsonPaths(jsonResponse, "$", paths);  // Start recursive path generation from root ($)
             return paths.ToList();
         }
         catch (Exception ex)
@@ -20,7 +16,12 @@ public class Mapper
         }
     }
 
-    private void GetJsonPaths(JToken token, string prefix)
+    public List<string> MapMovieAttributes(string jsonResponse)
+    {
+        return MapMovieAttributes(JToken.Parse(jsonResponse));
+    }
+
+    private void GetJsonPaths(JToken token, string prefix, HashSet<string> paths)
     {
         if (token == null)
         {
@@ -32,13 +33,13 @@ public class Mapper
             foreach (var property in token.Children<JProperty>())
             {
                 // Recurse into each property with updated JSONPath prefix
-                GetJsonPaths(property.Value, $"{prefix}.{property.Name}");
+                GetJsonPaths(property.Value, $"{prefix}.{property.Name}", paths);
             }
         }
         else if (token is JArray)
         {
             // Use wildcard * for array indices to generalize JSONPath
-            GetJsonPaths(token.First, $"{prefix}[*]");  // Process only the first item
+            GetJsonPaths(token.First, $"{prefix}[*]", paths);  // Process only the first item
         }
         else
         {

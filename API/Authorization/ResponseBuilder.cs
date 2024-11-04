@@ -3,17 +3,15 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace API
+namespace API.Authorization
 {
     public class ResponseBuilder
     {
         private readonly Mapper _mapper;
-        private TrieNode _head;  // Root node of the Trie
 
         public ResponseBuilder(Mapper mapper)
         {
             _mapper = mapper;
-            _head = null;
         }
 
         /// <summary>
@@ -22,42 +20,44 @@ namespace API
         /// <param name="originalResponse">Original JSON response from service provider</param>
         /// <param name="authorizedAttributes">List of JSONPath expressions for authorized attributes</param>
         /// <returns>Modified JSON with only authorized attributes</returns>
-        public string BuildResponse(string originalResponse, List<string> authorizedAttributes)
+        public string BuildResponse(JToken jsonResponse, List<string> authorizedAttributes)
         {
             try
             {
                 // Step 1: Build pattern trie with authorized attributes
-                _head = BuildPatternTrie(authorizedAttributes);
+                var head = BuildPatternTrie(authorizedAttributes);
 
                 // Step 2: Get all JSONPaths from the original response using Mapper
-                var allAttributes = _mapper.MapMovieAttributes(originalResponse);
+                var allAttributes = _mapper.MapMovieAttributes(jsonResponse);
 
                 // Step 3: Find forbidden attributes by checking against the Trie
                 var forbiddenAttributes = new List<string>();
                 foreach (var attribute in allAttributes)
                 {
-                    if (!SearchPatternTrie(_head, attribute))
+                    if (!SearchPatternTrie(head, attribute))
                     {
                         forbiddenAttributes.Add(attribute);
                     }
                 }
 
-                // Step 4: Convert JSON to JToken (DOM)
-                var jsonDom = JToken.Parse(originalResponse);
-
                 // Step 5: Remove forbidden attributes
                 foreach (var forbiddenPath in forbiddenAttributes)
                 {
-                    RemoveJsonPath(jsonDom, forbiddenPath);
+                    RemoveJsonPath(jsonResponse, forbiddenPath);
                 }
 
                 // Step 6: Convert back to JSON string
-                return jsonDom.ToString(Formatting.Indented);
+                return jsonResponse.ToString(Formatting.Indented);
             }
             catch (Exception ex)
             {
                 throw new InvalidOperationException("Failed to build filtered response", ex);
             }
+        }
+
+        public string BuildResponse(string originalResponse, List<string> authorizedAttributes)
+        {
+            return BuildResponse(JToken.Parse(originalResponse), authorizedAttributes);
         }
 
         /// <summary>

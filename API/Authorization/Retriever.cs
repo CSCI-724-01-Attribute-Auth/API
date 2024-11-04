@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace API
+namespace API.Authorization
 {
     public class Retriever
     {
-        private readonly IndexBuilder _indexBuilder;
+        private readonly IndexCache _indexCache;
 
-        public Retriever(IndexBuilder indexBuilder)
+        public Retriever(IndexCache indexCache)
         {
-            _indexBuilder = indexBuilder;
+            _indexCache = indexCache;
         }
         public List<string> GetAuthorizedAttributes(string clientId, string method, string path)
         {
@@ -18,12 +18,12 @@ namespace API
             var lookupKey = new Tuple<string, string>(clientId, method);
 
             // Check if the lookup key exists in the index
-            if (!_indexBuilder.Index.ContainsKey(lookupKey))
+            if (!_indexCache.CachedIndex.ContainsKey(lookupKey))
             {
                 throw new KeyNotFoundException("Client authorization not found in index.");
             }
 
-            var authorizedEndpoints = _indexBuilder.Index[lookupKey];
+            var authorizedEndpoints = _indexCache.CachedIndex[lookupKey];
 
             // Find matching endpoint path (using template matching)
             foreach (var endpointPath in authorizedEndpoints.Keys)

@@ -1,5 +1,6 @@
 using API;
 using API.App_Start;
+using API.Authorization;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -43,6 +44,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        app.UseMiddleware<AttributeAuthorizer>();
+
         app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader());
 
         app.UseStaticFiles();
