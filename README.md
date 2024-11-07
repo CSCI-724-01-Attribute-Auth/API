@@ -1,138 +1,98 @@
-# Movie API
+# API Project
 
-## Overview
-This project implements a sophisticated API authorization and response filtering system that allows fine-grained control over JSON response data based on client permissions. The system uses JSONPath expressions to specify which attributes clients are authorized to access and efficiently filters API responses to include only permitted data.
+This project is a C# ASP.NET Core API that includes an attribute-based authorization middleware, allowing fine-grained control over the API responses based on the `ClientId`. This README provides instructions on setting up, running, and using the API, along with details on its attribute-based authorization features.
 
-## Installation
-1. Clone the repository on your local machine and make sure you have .NET installed.
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Setup Instructions](#setup-instructions)
+- [Running the API](#running-the-api)
+- [API Structure and Key Endpoints](#api-structure-and-key-endpoints)
+- [Attribute-Based Authorization](#attribute-based-authorization)
+- [Error Handling](#error-handling)
 
-## Running the application
-Navigate to the root directory and use the followig command to run the application -
-`dotnet run`
+---
 
-## Architecture
+## Project Overview
 
-### Key Components
+This API enables authorized clients to access specific data fields based on their permissions. A middleware component (`AttributeAuthorizer`) inspects each request, validates the client's identity using an `X-Client-ID` header, and tailors the response by excluding unauthorized attributes based on client-specific rules.
 
-### Program.cs
+## Setup Instructions
 
--- Application entry point
--- Configures and initializes the web host
--- Handles database initialization
--- Triggers data seeding when necessary
+### Prerequisites
 
-### Startup.cs
+- [.NET Core SDK](https://dotnet.microsoft.com/download) (version 6.0 or higher)
+- SQL Database (if you want to customize database configurations)
+- Ensure environment variables and configurations are correctly set in `appsettings.json` if needed.
 
--- Configures the application's service container
--- Sets up middleware pipeline
--- Configures:
-    CORS policies
-    Database context
-    JSON serialization options
-    API routing
-    Dependency injection
+### Installation
 
-### Controllers
--- MoviesController
-    Handles movie-related endpoints
-    Implements CRUD operations for movies
-    Integrates with response filtering system
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd API
+   ```
 
--- PersonsController
-    Manages crew member data
-    Handles person-related operations
-    Implements person-movie relationship endpoints
+2. **Restore dependencies**:
+   ```bash
+   dotnet restore
+   ```
 
--- AuthorizedAttributesController
-    Manages authorization rules
-    Handles CRUD operations for attribute permissions
-    Provides endpoints for authorization management
+3. **Database Setup**:
+   The API uses a `DBContext` to interact with the database. Upon the first run, the application seeds the database with initial data if it is empty.
 
-### Core Components
-### Response Builder
-The ResponseBuilder class is responsible for filtering JSON responses based on authorized attributes:
+   Ensure the database configuration in `appsettings.json` or relevant environment variables are set correctly.
 
-    Uses a Trie data structure for efficient pattern matching
-    Removes unauthorized attributes from JSON responses
-    Handles nested objects and array patterns
-    Preserves JSON structure while removing unauthorized data
+## Running the API
 
-### Retriever
-The Retriever class manages the authorization lookup process:
+To run the API, use the following command from the project root directory:
 
-    Fetches authorized attributes based on client ID, HTTP method, and path
-    Supports template-based path matching for flexible endpoint definitions
-    Works with the IndexBuilder to maintain efficient access patterns
+```bash
+dotnet run --project API
+```
 
-### Data Layer
+The API will start on the configured port (e.g., `https://localhost:5020` or `http://localhost:5000` by default).
 
-    DBContext: Manages database connections and entity sets
-    DataFactory: Handles data seeding and sample data generation
-    IndexBuilder: Creates and maintains authorization indexes
+## API Structure and Key Endpoints
 
-### Models
+Here is an overview of the key endpoints and their purposes:
 
-    Movie: Represents movie data with properties like title, budget, and costs
-    Person: Stores crew member information
-    CrewMember: Manages movie-person relationships
-    AuthorizedAttributes: Defines client authorization rules
+- **Movies Endpoint** (`/movies`)
+  - **GET /movies/all**: Retrieves a list of all movies in the database, with attributes tailored to the client's authorization.
+  - **POST /movies**: Allows creating a new movie entry.
 
-### Dependency Management
+- **Authorization Requirement**
+  - All endpoints require an `X-Client-ID` header to determine which attributes are included in the response.
 
-    Utilizes dependency injection for loose coupling
-    Manages service lifetimes through DependencyRegistration
-    Supports testing through interface-based design
+## Attribute-Based Authorization
 
-#### Data Layer
-- `DBContext`: Manages database connections and entity sets
-- `DataFactory`: Handles data seeding and sample data generation
-- `IndexBuilder`: Creates and maintains authorization indexes
+The attribute-based authorization middleware (`AttributeAuthorizer`) filters API responses based on the `X-Client-ID`. This mechanism limits access to specific attributes within the response based on client permissions.
 
-#### Models
-- `Movie`: Represents movie data with properties like title, budget, and costs
-- `Person`: Stores crew member information
-- `CrewMember`: Manages movie-person relationships
-- `AuthorizedAttributes`: Defines client authorization rules
+### How It Works
 
-#### Response Builder
-The `ResponseBuilder` class is responsible for filtering JSON responses based on authorized attributes:
-- Uses a Trie data structure for efficient pattern matching
-- Removes unauthorized attributes from JSON responses
-- Handles nested objects and array patterns
-- Preserves JSON structure while removing unauthorized data
+1. **Middleware Interception**: The `AttributeAuthorizer` middleware intercepts every request, reading the `X-Client-ID` header to identify the client.
+   
+2. **Authorization Rules**: The `Retriever` class checks the client's permissions in an in-memory `IndexCache`, which stores authorized paths and attributes for each client. If the client is authorized, the middleware will proceed to filter the response.
 
-#### Retriever
-The `Retriever` class manages the authorization lookup process:
-- Fetches authorized attributes based on client ID, HTTP method, and path
-- Supports template-based path matching for flexible endpoint definitions
-- Works with the IndexBuilder to maintain efficient access patterns
+3. **Response Filtering**: If the client's ID and requested endpoint path match a template in their authorization profile, only the permitted attributes are included in the response. Unauthorized fields are removed from the JSON response, ensuring data confidentiality.
 
+### Adding New Authorization Rules
 
-## Technical Details
-
-### Response Filtering Process
-1. Build a Trie from authorized JSONPath patterns
-2. Extract all attributes from the original JSON response
-3. Identify unauthorized attributes using Trie pattern matching
-4. Return the filtered JSON response
+To modify authorization rules or add new client configurations:
+- Update the data in `authorizationRecords.json` or make changes directly in the database as necessary.
+- The `IndexCache` and `Retriever` services will use these updated configurations.
 
 ## Error Handling
-The system includes comprehensive error handling for:
-- Invalid JSON responses
-- Unauthorized client access
-- Malformed JSONPath expressions
-- Non-existent endpoints
-- Template matching failures
 
-## Performance Considerations
-- Uses Trie data structure for O(m) pattern matching (where m is pattern length)
-- Efficient index-based lookup for client authorizations
-- Optimized JSON parsing and manipulation
-- Template matching with regular expressions for flexibility
+- **Missing Client ID**: If a request does not include an `X-Client-ID` header, the middleware will throw an `InvalidOperationException`.
+- **Unauthorized Access**: If the client attempts to access an endpoint they do not have permissions for, the response will exclude restricted attributes.
+- **Database Errors**: Any issues during database seeding or connection are logged.
 
-## Security Features
-- Attribute-level access control
-- No information leakage through error messages
-- Secure handling of sensitive data
+## Additional Configuration
 
+The following components are configurable:
+- **Database Connection**: Configure in `appsettings.json`.
+- **Middleware Behavior**: Customize `AttributeAuthorizer` if further response processing is needed.
 
+## License
+
+This project is licensed under the terms specified in the `LICENSE` file.
