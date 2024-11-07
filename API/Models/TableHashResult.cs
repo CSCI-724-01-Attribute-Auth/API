@@ -1,12 +1,17 @@
 ﻿#nullable disable
 
 using System.ComponentModel.DataAnnotations.Schema;
+// In summary, TableHashResult is a utility class to manage hash data with properties to
+//  check if the hash is empty, methods to compare two instances by hash, and a custom hash
+//  code generation. This setup might be useful in scenarios where you want to store, compare, or 
+// check for empty hash data related to some table or entity.
 
 namespace API.Models
 {
     public class TableHashResult
     {
-        public TableHashResult() { 
+        public TableHashResult()
+        {
             TableHash = Array.Empty<byte>();
         }
 

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 namespace API.Data
 {
 
-    public class DBContext: DbContext
+    public class DBContext : DbContext
     {
         public DBContext() { }
 

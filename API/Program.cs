@@ -18,7 +18,7 @@ public class Program
                 // Check if the database is empty and seed it
                 if (!context.Movies.Any())
                 {
-                    dataFactory.Seed(context); // Call your seeding logic here
+                    dataFactory.Seed(context);
                 }
             }
             catch (Exception ex)
@@ -31,7 +31,7 @@ public class Program
         app.Run();
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args) => 
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
