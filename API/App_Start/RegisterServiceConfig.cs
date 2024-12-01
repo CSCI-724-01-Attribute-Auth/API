@@ -11,6 +11,7 @@ namespace API.App_Start
         {
             services.AddScoped<IMovieService, MovieService>();
             services.AddScoped<IPersonService, PersonService>();
+            services.AddScoped<ILoginService, LoginService>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<DataFactory>();
             services.AddScoped<IndexBuilder>();

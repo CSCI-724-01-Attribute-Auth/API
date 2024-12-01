@@ -41,7 +41,7 @@ namespace API.Authorization
         {
             // Retrieve the latest hash from the database
             var newHash = _dbContext.Set<TableHashResult>()
-                .FromSqlRaw("SELECT HASHBYTES('MD5', STRING_AGG(CONCAT(ClientId, Method, Path, CAST(AttributeList AS NVARCHAR(MAX))), '')) AS TableHash FROM AuthorizedAttributes")
+                .FromSqlRaw("SELECT HASHBYTES('MD5', STRING_AGG(CONCAT(RoleId, Method, Path, CAST(AttributeList AS NVARCHAR(MAX))), '')) AS TableHash FROM AuthorizedAttributesByRole")
                 .AsEnumerable()
                 .First();
 
@@ -54,9 +54,9 @@ namespace API.Authorization
             // Otherwise, update the cache with a fresh copy from the database
             var updatedIndex = new Dictionary<Tuple<string, string>, Dictionary<string, List<string>>>();
 
-            foreach (var endpoint in _dbContext.AuthorizedAttributes.ToList())
+            foreach (var endpoint in _dbContext.AuthorizedAttributesByRole.ToList())
             {
-                var indexKey = new Tuple<string, string>(endpoint.ClientId, endpoint.Method);
+                var indexKey = new Tuple<string, string>(endpoint.RoleId, endpoint.Method);
 
                 if (!updatedIndex.ContainsKey(indexKey))
                 {

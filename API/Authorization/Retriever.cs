@@ -12,18 +12,19 @@ namespace API.Authorization
         {
             _indexCache = indexCache;
         }
-        public List<string> GetAuthorizedAttributes(string clientId, string method, string path)
+        public List<string> GetAuthorizedAttributes(string roleId, string method, string path)
         {
             // Create the lookup key as a Tuple
-            var lookupKey = new Tuple<string, string>(clientId, method);
+            var lookupKey = new Tuple<string, string>(roleId, method);
+
+            Dictionary<string, List<string>>? authorizedEndpoints;
 
             // Check if the lookup key exists in the index
-            if (!_indexCache.CachedIndex.ContainsKey(lookupKey))
+            if (!_indexCache.CachedIndex.TryGetValue(lookupKey, out authorizedEndpoints))
             {
-                throw new KeyNotFoundException("Client authorization not found in index.");
+                _indexCache.CachedIndex.Keys.ToList().ForEach(Console.WriteLine);
+                throw new KeyNotFoundException("Authorization not found in index.");
             }
-
-            var authorizedEndpoints = _indexCache.CachedIndex[lookupKey];
 
             // Find matching endpoint path (using template matching)
             foreach (var endpointPath in authorizedEndpoints.Keys)

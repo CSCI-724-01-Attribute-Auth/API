@@ -20,6 +20,12 @@ namespace API.Data
 
         public virtual DbSet<AuthorizedAttributes> AuthorizedAttributes { get; set; }
 
+        public virtual DbSet<AuthorizedAttributesByRole> AuthorizedAttributesByRole { get; set; }
+
+        public virtual DbSet<User> Users { get; set; }
+
+        public virtual DbSet<Role> Roles { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             ArgumentNullException.ThrowIfNull(optionsBuilder);
@@ -73,6 +79,24 @@ namespace API.Data
                         l => l.HasOne<Person>().WithMany().HasForeignKey(e => e.PersonId),
                         r => r.HasOne<Movie>().WithMany().HasForeignKey(e => e.MovieId)
                     );
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable(nameof(User));
+
+                entity.HasKey(e => e.UserId)
+                    .HasName("PK__User__1788CC4CC998D989");
+
+                entity.Property(e => e.RoleId)
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
+
+                entity.HasOne(e => e.Role)
+                    .WithMany()
+                    .HasForeignKey(e => e.RoleId)
+                    .HasConstraintName("FK__User__RoleId__06CD04F7")
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<Person>(entity =>
@@ -142,6 +166,36 @@ namespace API.Data
                 entity.Property(e => e.AttributeList)
                     .HasColumnType("json")
                     .IsRequired();
+            });
+
+            modelBuilder.Entity<AuthorizedAttributesByRole>(entity =>
+            {
+                entity.ToTable(nameof(AuthorizedAttributesByRole));
+
+                entity.HasKey(e => new { e.RoleId, e.Method, e.Path })
+                    .HasName("PK_AuthorizedAttributesByRole");
+
+                entity.Property(e => e.RoleId)
+                    .HasColumnType("varchar(50)")
+                    .IsRequired();
+
+                entity.Property(e => e.Method)
+                    .HasColumnType("varchar(10)")
+                    .IsRequired();
+
+                entity.Property(e => e.Path)
+                    .HasColumnType("varchar(255)")
+                    .IsRequired();
+
+                entity.Property(e => e.AttributeList)
+                    .HasColumnType("json")
+                    .IsRequired();
+
+                entity.HasOne(e => e.Role)
+                    .WithMany()
+                    .HasForeignKey(e => e.RoleId)
+                    .HasConstraintName("FK_AuthorizedAttributesByRole_RoleId")
+                    .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

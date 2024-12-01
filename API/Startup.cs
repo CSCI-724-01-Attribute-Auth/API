@@ -2,7 +2,10 @@ using API;
 using API.App_Start;
 using API.Authorization;
 using API.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 
@@ -29,6 +32,24 @@ public class Startup
                 });
         });
 
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            var key = Encoding.ASCII.GetBytes("your_very_secret_key_here");
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false, // Adjust according to your needs
+                ValidateAudience = false, // Adjust according to your needs
+                ValidateLifetime = true
+            };
+        });
+
         services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -44,13 +65,13 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        app.UseMiddleware<AttributeAuthorizer>();
-
         app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader());
 
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseMiddleware<AttributeAuthorizer>();
 
         app.UseAuthorization();
 
