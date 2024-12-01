@@ -1,4 +1,5 @@
-﻿using API.Data;
+﻿using API.Authorization;
+using API.Data;
 using API.Models;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace API.Controllers
         }
 
         [HttpGet("all")]
+        [UseAttributeAuthorizer]
         [ProducesResponseType(typeof(List<Person>), StatusCodes.Status200OK)]
         public IActionResult All()
         {
@@ -24,6 +26,7 @@ namespace API.Controllers
         }
 
         [HttpGet("")]
+        [UseAttributeAuthorizer]
         [ProducesResponseType(typeof(Person), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult GetPersonById([FromQuery] int id)
@@ -38,6 +41,7 @@ namespace API.Controllers
         }
 
         [HttpPost("")]
+        [UseAttributeAuthorizer]
         [ProducesResponseType(typeof(Person), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

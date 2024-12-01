@@ -1,4 +1,5 @@
-﻿using API.Data;
+﻿using API.Authorization;
+using API.Data;
 using API.Models;
 using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,7 @@ namespace API.Controllers
         /// </summary>
         /// <returns>A list of movies with an HTTP 200 status.</returns>
         [HttpGet("all")]
+        [UseAttributeAuthorizer]
         [ProducesResponseType(typeof(List<Movie>), StatusCodes.Status200OK)]
         public IActionResult All()
         {
@@ -44,6 +46,7 @@ namespace API.Controllers
         /// HTTP 204 if the movie is not found.
         /// </returns>
         [HttpGet("")]
+        [UseAttributeAuthorizer]
         [ProducesResponseType(typeof(Movie), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult GetMovieById([FromQuery] int id)
@@ -73,6 +76,7 @@ namespace API.Controllers
         /// HTTP 500 if there is an internal server error.
         /// </returns>
         [HttpPost("")]
+        [UseAttributeAuthorizer]
         [ProducesResponseType(typeof(Movie), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

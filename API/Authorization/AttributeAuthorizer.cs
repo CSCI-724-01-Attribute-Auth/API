@@ -20,7 +20,7 @@ namespace API.Authorization
         public async Task InvokeAsync(HttpContext context)
         {
             var endpoint = context.GetEndpoint();
-            if (endpoint?.Metadata.GetMetadata<SkipAttributeAuthorizerAttribute>() != null)
+            if (endpoint?.Metadata.GetMetadata<UseAttributeAuthorizer>() == null)
             {
                 // Skip middleware logic and call the next middleware
                 await _next(context);
