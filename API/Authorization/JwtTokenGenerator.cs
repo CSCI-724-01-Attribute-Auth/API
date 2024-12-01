@@ -21,11 +21,11 @@ public class JwtTokenGenerator
         };
 
         if (roleId != null) {
-            Console.WriteLine("Adding Role");
+            //Console.WriteLine("Adding Role");
             claims = claims.Append(new Claim(ClaimTypes.Role, roleId)).ToArray();
         }
 
-        Console.WriteLine(claims.Length);
+        //Console.WriteLine(claims.Length);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

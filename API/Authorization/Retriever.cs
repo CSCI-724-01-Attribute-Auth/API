@@ -22,7 +22,7 @@ namespace API.Authorization
             // Check if the lookup key exists in the index
             if (!_indexCache.CachedIndex.TryGetValue(lookupKey, out authorizedEndpoints))
             {
-                _indexCache.CachedIndex.Keys.ToList().ForEach(Console.WriteLine);
+                //_indexCache.CachedIndex.Keys.ToList().ForEach(Console.WriteLine);
                 throw new KeyNotFoundException("Authorization not found in index.");
             }
 

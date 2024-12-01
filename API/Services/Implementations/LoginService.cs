@@ -27,7 +27,7 @@ namespace API.Services.Implementations
 
             if (user != null)
             {
-                Console.WriteLine("{0}, {1}", userId, user.RoleId);
+                //Console.WriteLine("{0}, {1}", userId, user.RoleId);
                 return JwtTokenGenerator.GenerateToken(userId, user.RoleId);
             }
 
