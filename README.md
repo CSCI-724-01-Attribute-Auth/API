@@ -1,6 +1,6 @@
 # API Project
 
-This project is a C# ASP.NET Core API that includes an attribute-based authorization middleware, allowing fine-grained control over the API responses based on the `ClientId`. This README provides instructions on setting up, running, and using the API, along with details on its attribute-based authorization features.
+This project is a C# ASP.NET Core API that includes an attribute-based authorization middleware, allowing fine-grained control over the API responses based on either the `ClientId` (IBAC) or the `RoleId` (RBAC). This README provides instructions on setting up, running, and using the API, along with details on its attribute-based authorization features.
 
 ## Table of Contents
 - [Project Overview](#project-overview)
@@ -14,14 +14,14 @@ This project is a C# ASP.NET Core API that includes an attribute-based authoriza
 
 ## Project Overview
 
-This API enables authorized clients to access specific data fields based on their permissions. A middleware component (`AttributeAuthorizer`) inspects each request, validates the client's identity using an `X-Client-ID` header, and tailors the response by excluding unauthorized attributes based on client-specific rules.
+This API enables authorized clients to access specific data fields based on their permissions. A middleware component (`Authorization/AttributeAuthorizer.cs`) inspects each request, validates the client's identity using an Bearer Token, and tailors the response by excluding unauthorized attributes based on client-specific rules.
 
 ## Setup Instructions
 
 ### Prerequisites
 
 - [.NET Core SDK](https://dotnet.microsoft.com/download) (version 6.0 or higher)
-- SQL Database (if you want to customize database configurations)
+- SQL Database
 - Ensure environment variables and configurations are correctly set in `appsettings.json` if needed.
 
 ### Installation
@@ -56,20 +56,23 @@ The API will start on the configured port (e.g., `https://localhost:5020` or `ht
 
 Here is an overview of the key endpoints and their purposes:
 
-- **Movies Endpoint** (`/movies`)
-  - **GET /movies/all**: Retrieves a list of all movies in the database, with attributes tailored to the client's authorization.
-  - **POST /movies**: Allows creating a new movie entry.
+- **Movies Endpoint** (`/movie`)
+  - **GET /movie/all**: Retrieves a list of all movies in the database, with attributes tailored to the client's authorization.
+  - **POST /movie?id=XYZ**: Retrieves a movie in the database, with attributes tailored to the client's authorization.
+  - **POST /movie**: Allows creating a new movie entry.
 
-- **Authorization Requirement**
-  - All endpoints require an `X-Client-ID` header to determine which attributes are included in the response.
+- **Movies Endpoint** (`/person`)
+  - **GET /person/all**: Retrieves a list of all persons in the database, with attributes tailored to the client's authorization.
+  - **POST /person?id=XYZ**: Retrieves a person in the database, with attributes tailored to the client's authorization.
+  - **POST /person**: Allows creating a new person entry.
 
 ## Attribute-Based Authorization
 
-The attribute-based authorization middleware (`AttributeAuthorizer`) filters API responses based on the `X-Client-ID`. This mechanism limits access to specific attributes within the response based on client permissions.
+The attribute-based authorization middleware (`AttributeAuthorizer`) filters API responses based on the Bearer Token. This mechanism limits access to specific attributes within the response based on client permissions.
 
 ### How It Works
 
-1. **Middleware Interception**: The `AttributeAuthorizer` middleware intercepts every request, reading the `X-Client-ID` header to identify the client.
+1. **Middleware Interception**: The `AttributeAuthorizer` middleware intercepts every request that is specified with the `[UseAttributeAuthorizer]` decorator, reading the Bearer Token header to identify the client.
    
 2. **Authorization Rules**: The `Retriever` class checks the client's permissions in an in-memory `IndexCache`, which stores authorized paths and attributes for each client. If the client is authorized, the middleware will proceed to filter the response.
 
@@ -78,12 +81,12 @@ The attribute-based authorization middleware (`AttributeAuthorizer`) filters API
 ### Adding New Authorization Rules
 
 To modify authorization rules or add new client configurations:
-- Update the data in `authorizationRecords.json` or make changes directly in the database as necessary.
+- Update the data the database as necessary, see the `Scripts` folder for examples.
 - The `IndexCache` and `Retriever` services will use these updated configurations.
 
 ## Error Handling
 
-- **Missing Client ID**: If a request does not include an `X-Client-ID` header, the middleware will throw an `InvalidOperationException`.
+- **Missing Client ID**: If a request does not include an Bearer token, the middleware will throw an `InvalidOperationException`.
 - **Unauthorized Access**: If the client attempts to access an endpoint they do not have permissions for, the response will exclude restricted attributes.
 - **Database Errors**: Any issues during database seeding or connection are logged.
 
@@ -91,7 +94,6 @@ To modify authorization rules or add new client configurations:
 
 The following components are configurable:
 - **Database Connection**: Configure in `appsettings.json`.
-- **Middleware Behavior**: Customize `AttributeAuthorizer` if further response processing is needed.
 
 ## License
 
