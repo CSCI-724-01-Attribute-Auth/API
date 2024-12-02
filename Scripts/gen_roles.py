@@ -1,4 +1,5 @@
 import random
+import sys
 
 paths_and_attributes = {
     "/movie": [
@@ -29,8 +30,8 @@ paths_and_attributes = {
     ]
 }
 
-def generate_sql_for_roles(seed=0, batch_size=1000, output_file="insert_authorized_attributes_by_role.sql"):
-    roles = [f"{i:06}" for i in range(1, 101)]  # Role IDs: "000001" to "000100"
+def generate_sql_for_roles(role_count=100, seed=0, batch_size=1000, output_file="insert_authorized_attributes_by_role.sql"):
+    roles = [f"{i:06}" for i in range(1, role_count + 1)]
     random.seed(seed)
 
     values = []
@@ -58,11 +59,8 @@ def generate_sql_for_roles(seed=0, batch_size=1000, output_file="insert_authoriz
                 + ",\n".join(values) + ";\n"
             )
 
-# Generate the SQL
-generate_sql_for_roles(seed=42, batch_size=1000)
-
-def generate_sql_for_users(seed=0, batch_size=1000, output_file="insert_authorized_attributes.sql"):
-    users = [f"{i:06}" for i in range(1, 10001)]  # User IDs: "000001" to "010000"
+def generate_sql_for_users(user_count=100, seed=0, batch_size=1000, output_file="insert_authorized_attributes.sql"):
+    users = [f"{i:06}" for i in range(1, user_count + 1)]
     random.seed(seed)
 
     values = []
@@ -90,5 +88,5 @@ def generate_sql_for_users(seed=0, batch_size=1000, output_file="insert_authoriz
                 + ",\n".join(values) + ";\n"
             )
 
-# Generate the SQL
-generate_sql_for_users(seed=42, batch_size=1000)
+generate_sql_for_roles(role_count=int(sys.argv[1]), seed=42, batch_size=1000)
+generate_sql_for_users(user_count=int(sys.argv[2]), seed=42, batch_size=1000)

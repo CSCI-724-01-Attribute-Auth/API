@@ -2,6 +2,7 @@ import requests
 import random
 import threading
 import time
+import sys
 
 # API base URL
 BASE_URL = "http://localhost:5020"
@@ -14,70 +15,59 @@ person_ids = []
 successful_operations = threading.Lock()
 operation_counts = []
 
-def login_and_get_movies(user_id):
-    # Step 1: Login and retrieve the access token
+def login_and_get_movies(user_id, session):
+    """Login and retrieve access token, then fetch movie and person IDs."""
     login_url = f"{BASE_URL}/login?userId={user_id}"
-    login_response = requests.post(login_url)
+    login_response = session.post(login_url)
 
     if login_response.status_code != 200:
         print(f"Failed to login as user {user_id}. Status code: {login_response.status_code}")
         print(f"Response: {login_response.text}")
-        return
+        return [], []
 
     login_data = login_response.json()
     access_token = login_data.get("access_token")
     if not access_token:
         print("Access token not found in the login response.")
-        return
+        return [], []
 
-    print(f"Logged in as user {user_id}. Access token: {access_token}")
-
-    # Step 2: Fetch the movies list
-    movies_url = f"{BASE_URL}/movie/all"
     headers = {"Authorization": f"Bearer {access_token}"}
-    movies_response = requests.get(movies_url, headers=headers)
 
+    # Fetch movies
+    movies_url = f"{BASE_URL}/movie/all"
+    movies_response = session.get(movies_url, headers=headers)
     if movies_response.status_code != 200:
         print(f"Failed to fetch movies. Status code: {movies_response.status_code}")
-        print(f"Response: {movies_response.text}")
-        return
+        return [], []
 
     movies_data = movies_response.json()
-
-    # Step 3: Extract all IDs from the "movies" list
     movie_ids = [movie.get("id") for movie in movies_data.get("movies", []) if "id" in movie]
 
-    # Step 2: Fetch the movies list
+    # Fetch persons
     persons_url = f"{BASE_URL}/person/all"
-    persons_response = requests.get(persons_url, headers=headers)
-
+    persons_response = session.get(persons_url, headers=headers)
     if persons_response.status_code != 200:
-        print(f"Failed to fetch movies. Status code: {persons_response.status_code}")
-        print(f"Response: {persons_response.text}")
-        return
+        print(f"Failed to fetch persons. Status code: {persons_response.status_code}")
+        return [], []
 
     persons_data = persons_response.json()
-
-    # Step 3: Extract all IDs from the "movies" list
     person_ids = [person.get("id") for person in persons_data.get("persons", []) if "id" in person]
 
     return movie_ids, person_ids
 
-def login(user_id):
-    """Login and retrieve an access token."""
-    login_url = f"{BASE_URL}/login?userId={user_id}"
-    response = requests.post(login_url)
-    if response.status_code == 200:
-        data = response.json()
-        return data.get("access_token")
-    return None
-
-def perform_operation():
+def perform_operation(session):
     """Perform a single operation by logging in and making a request."""
     user_id = f"{random.randint(1, 10000):06}"  # Generate a new random user ID
-    access_token = login(user_id)
+    login_url = f"{BASE_URL}/login?userId={user_id}"
+    login_response = session.post(login_url)
+
+    if login_response.status_code != 200:
+        return False
+
+    login_data = login_response.json()
+    access_token = login_data.get("access_token")
     if not access_token:
-        return False  # Login failed, count as unsuccessful
+        return False
 
     headers = {"Authorization": f"Bearer {access_token}"}
     choice = random.random()
@@ -85,61 +75,61 @@ def perform_operation():
     # 40% chance of `/movie?id=XXX`
     if choice < 0.4 and movie_ids:
         movie_id = random.choice(movie_ids)
-        response = requests.get(f"{BASE_URL}/movie?id={movie_id}", headers=headers)
+        response = session.get(f"{BASE_URL}/movie?id={movie_id}", headers=headers)
         return response.status_code == 200
 
     # 40% chance of `/person?id=XXX`
     elif choice < 0.8 and person_ids:
         person_id = random.choice(person_ids)
-        response = requests.get(f"{BASE_URL}/person?id={person_id}", headers=headers)
+        response = session.get(f"{BASE_URL}/person?id={person_id}", headers=headers)
         return response.status_code == 200
 
     # 10% chance of `/movie/all`
     elif choice < 0.9:
-        response = requests.get(f"{BASE_URL}/movie/all", headers=headers)
+        response = session.get(f"{BASE_URL}/movie/all", headers=headers)
         return response.status_code == 200
 
     # 10% chance of `/person/all`
     else:
-        response = requests.get(f"{BASE_URL}/person/all", headers=headers)
+        response = session.get(f"{BASE_URL}/person/all", headers=headers)
         return response.status_code == 200
 
 def thread_function(thread_id, duration):
     """Run a thread for the specified duration, performing random operations."""
     global successful_operations
 
+    session = requests.Session()  # Create a session for this thread
     successful_count = 0
     start_time = time.time()
 
     while time.time() - start_time < duration:
-        if perform_operation():
+        if perform_operation(session):
             successful_count += 1
 
     # Store the result in a thread-safe way
     with successful_operations:
         operation_counts.append((thread_id, successful_count))
 
-    print(f"Thread {thread_id}: Completed {successful_count} successful operations.")
+    # print(f"Thread {thread_id}: Completed {successful_count} successful operations.")
 
-def multithreaded_test():
-    """Run the multithreaded test with 10 threads for 5 minutes."""
+def multithreaded_test(t_count, dur_min):
+    """Run the multithreaded test with 10 threads for the specified duration."""
     global movie_ids, person_ids
 
-    # Login and fetch movie and person IDs using user 000002
-    movie_ids, person_ids = login_and_get_movies("000002")
+    # Use a temporary session to fetch movie and person IDs
+    with requests.Session() as temp_session:
+        movie_ids, person_ids = login_and_get_movies("000002", temp_session)
+
     if not movie_ids or not person_ids:
         print("Failed to retrieve movie or person IDs.")
         return
 
-    print(f"Retrieved {len(movie_ids)} movie IDs and {len(person_ids)} person IDs.")
-
     # Number of threads and duration
-    num_threads = 10
-    duration = 5 * 60  # 5 minutes in seconds
+    duration = dur_min * 60  # Convert minutes to seconds
 
     # Create and start threads
     threads = []
-    for i in range(num_threads):
+    for i in range(t_count):
         thread = threading.Thread(target=thread_function, args=(i + 1, duration))
         threads.append(thread)
         thread.start()
@@ -150,9 +140,15 @@ def multithreaded_test():
 
     # Print the results
     total_operations = sum(count for _, count in operation_counts)
-    print(f"\nTotal successful operations: {total_operations}")
-    for thread_id, count in operation_counts:
-        print(f"Thread {thread_id}: {count} successful operations.")
+    print(f"Total successful operations: {total_operations}")
 
 # Run the test
-multithreaded_test()
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        t_count, dur_min = int(sys.argv[1]), float(sys.argv[2])
+        multithreaded_test(t_count, dur_min)
+    else:
+        dur_min = 5
+        for i in range(15):
+            print(f'Running {i + 1} threads...')
+            multithreaded_test(i + 1, dur_min)
