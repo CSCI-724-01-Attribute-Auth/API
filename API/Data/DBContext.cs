@@ -86,7 +86,7 @@ namespace API.Data
                 entity.ToTable(nameof(User));
 
                 entity.HasKey(e => e.UserId)
-                    .HasName("PK__User__1788CC4CC998D989");
+                    .HasName("PK_User");
 
                 entity.Property(e => e.RoleId)
                     .HasColumnType("varchar(50)")
@@ -95,8 +95,16 @@ namespace API.Data
                 entity.HasOne(e => e.Role)
                     .WithMany()
                     .HasForeignKey(e => e.RoleId)
-                    .HasConstraintName("FK__User__RoleId__06CD04F7")
+                    .HasConstraintName("FK_User_RoleId")
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.ToTable(nameof(Role));
+
+                entity.HasKey(e => e.RoleId)
+                    .HasName("PK_Role");
             });
 
             modelBuilder.Entity<Person>(entity =>
