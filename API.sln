@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{77226627-A8DC-4AD4-8837-B64D6D00DCA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RBAC_API", "RBAC_API\RBAC_API.csproj", "{2D1F8575-F6E6-45D9-82E7-A686935BBB97}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IBAC_API", "IBAC_API\IBAC_API.csproj", "{6E9EEAB9-32C0-4235-8C9F-E665DC4CE9B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{77226627-A8DC-4AD4-8837-B64D6D00DCA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77226627-A8DC-4AD4-8837-B64D6D00DCA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77226627-A8DC-4AD4-8837-B64D6D00DCA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77226627-A8DC-4AD4-8837-B64D6D00DCA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D1F8575-F6E6-45D9-82E7-A686935BBB97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D1F8575-F6E6-45D9-82E7-A686935BBB97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D1F8575-F6E6-45D9-82E7-A686935BBB97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D1F8575-F6E6-45D9-82E7-A686935BBB97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E9EEAB9-32C0-4235-8C9F-E665DC4CE9B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E9EEAB9-32C0-4235-8C9F-E665DC4CE9B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E9EEAB9-32C0-4235-8C9F-E665DC4CE9B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E9EEAB9-32C0-4235-8C9F-E665DC4CE9B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
