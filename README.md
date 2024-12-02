@@ -16,6 +16,8 @@ This project is a C# ASP.NET Core API that includes an attribute-based authoriza
 
 This API enables authorized clients to access specific data fields based on their permissions. A middleware component (`Authorization/AttributeAuthorizer.cs`) inspects each request, validates the client's identity using an Bearer Token, and tailors the response by excluding unauthorized attributes based on client-specific rules.
 
+An overview of the authorization files (the meat and potatos of what we added), see the `Authorization/README.md` file in each project (`RBAC_API` and `IBAC_API`).
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -28,7 +30,7 @@ This API enables authorized clients to access specific data fields based on thei
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/CSCI-724-01-Attribute-Auth/API
    cd API
    ```
 
