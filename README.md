@@ -49,7 +49,12 @@ An overview of the authorization files (the meat and potatos of what we added), 
 To run the API, use the following command from the project root directory:
 
 ```bash
-dotnet run --project API
+dotnet run --project RBAC_API
+```
+or
+
+```bash
+dotnet run --project IBAC_API
 ```
 
 The API will start on the configured port (e.g., `https://localhost:5020` or `http://localhost:5000` by default).
